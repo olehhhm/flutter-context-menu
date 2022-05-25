@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 
 typedef Widget ContextMenuButtonBuilder(BuildContext context, ContextMenuButtonConfig config,
     [ContextMenuButtonStyle? style]);
@@ -32,7 +30,7 @@ class _ContextMenuButtonState extends State<ContextMenuButton> {
       fgColor: widget.style?.fgColor ?? defaultTextColor,
       bgColor: widget.style?.bgColor ?? Colors.transparent,
       hoverBgColor: widget.style?.hoverBgColor ?? Theme.of(context).backgroundColor.withOpacity(.2),
-      hoverFgColor: widget.style?.hoverFgColor ?? Theme.of(context).accentColor,
+      hoverFgColor: widget.style?.hoverFgColor ?? Theme.of(context).colorScheme.secondary,
       padding: widget.style?.padding ?? EdgeInsets.all(6),
     );
 
