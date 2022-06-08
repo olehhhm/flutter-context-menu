@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 class MeasuredSizeWidget extends SingleChildRenderObjectWidget {
-  const MeasuredSizeWidget({Key? key, required this.onChange, required Widget child}) : super(key: key, child: child);
+  const MeasuredSizeWidget(
+      {Key? key, required this.onChange, required Widget child})
+      : super(key: key, child: child);
   final void Function(Size size) onChange;
   @override
-  RenderObject createRenderObject(BuildContext context) => _MeasureSizeRenderObject(onChange);
+  RenderObject createRenderObject(BuildContext context) =>
+      _MeasureSizeRenderObject(onChange);
 }
 
 class _MeasureSizeRenderObject extends RenderProxyBox {
@@ -19,6 +22,9 @@ class _MeasureSizeRenderObject extends RenderProxyBox {
     Size newSize = child?.size ?? Size.zero;
     if (_prevSize == newSize) return;
     _prevSize = newSize;
-    WidgetsBinding.instance?.addPostFrameCallback((_) => onChange(newSize));
+    _ambiguate(WidgetsBinding.instance)
+        ?.addPostFrameCallback((_) => onChange(newSize));
   }
+
+  T? _ambiguate<T>(T? value) => value;
 }
