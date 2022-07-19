@@ -55,6 +55,7 @@ class ContextMenuOverlayState extends State<ContextMenuOverlay> {
   ContextMenuDividerBuilder? get dividerBuilder => widget.dividerBuilder;
   ContextMenuCardBuilder? get cardBuilder => widget.cardBuilder;
   ContextMenuButtonStyle get buttonStyle => widget.buttonStyle ?? defaultButtonStyle;
+  bool get isOpen => _currentMenu != null;
 
   @override
   Widget build(BuildContext context) {
