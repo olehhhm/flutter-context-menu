@@ -19,6 +19,7 @@ class ContextMenuOverlay extends StatefulWidget {
     this.buttonBuilder,
     this.dividerBuilder,
     this.buttonStyle = const ContextMenuButtonStyle(),
+    this.fullModeBackgroundColor = Colors.black54,
   }) : super(key: key);
   final Widget child;
 
@@ -35,6 +36,9 @@ class ContextMenuOverlay extends StatefulWidget {
   /// You can ignore this if you're using a custom button builder, or use it if it works for your styling system.
   final ContextMenuButtonStyle? buttonStyle;
 
+  /// Background color for full mode.
+  final Color fullModeBackgroundColor;
+
   @override
   ContextMenuOverlayState createState() => ContextMenuOverlayState();
 
@@ -48,9 +52,11 @@ class ContextMenuOverlayState extends State<ContextMenuOverlay> {
   static ContextMenuButtonStyle defaultButtonStyle = ContextMenuButtonStyle();
 
   Widget? _currentMenu;
+  bool _isFullMode = false;
   Size? _prevSize;
   Size _menuSize = Size.zero;
   Offset _mousePos = Offset.zero;
+  double edgePadding = 3;
 
   ContextMenuButtonBuilder? get buttonBuilder => widget.buttonBuilder;
   ContextMenuDividerBuilder? get dividerBuilder => widget.dividerBuilder;
@@ -66,18 +72,7 @@ class ContextMenuOverlayState extends State<ContextMenuOverlay> {
         // Remove any open menus when we resize (common behavior, and avoids edge cases / complexity)
         _nullMenuIfOverlayWasResized(constraints);
         // Offset the menu depending on which quadrant of the app we're in, this will make sure it always stays in bounds.
-        double dx = 0, dy = 0;
-        if (_mousePos.dx > (_prevSize?.width ?? 0) / 2) dx = -_menuSize.width;
-        if (_mousePos.dy > (_prevSize?.height ?? 0) / 2) dy = -_menuSize.height;
-        // The final menuPos, is mousePos + quadrant offset
-
-        Offset _menuPos = _mousePos + Offset(dx, dy);
-        if (_menuPos.dx < 0) {
-          _menuPos = Offset(0, _menuPos.dy);
-        }
-        if (_menuPos.dy < 0) {
-          _menuPos = Offset(_menuPos.dx, 0);
-        }
+        Offset _menuPos = _calculateMenuPosition();
         Widget? menuToShow = _currentMenu;
 
         return _InheritedContextMenuOverlay(
@@ -94,7 +89,10 @@ class ContextMenuOverlayState extends State<ContextMenuOverlay> {
                     // Show the menu?
                     if (menuToShow != null) ...[
                       Positioned.fill(
-                          child: Container(color: Colors.transparent)),
+                          child: Container(
+                              color: _isFullMode
+                                  ? widget.fullModeBackgroundColor
+                                  : Colors.transparent)),
 
                       /// Underlay, blocks all taps to the main content.
                       GestureDetector(
@@ -130,16 +128,20 @@ class ContextMenuOverlayState extends State<ContextMenuOverlay> {
 
   /// Sets the current menu to be displayed.
   /// It will not be displayed until next frame, as the child needs to be measured first.
-  void show(Widget child) {
+  void show(Widget child, {bool isFullMode = false}) {
     setState(() {
       //This will hide the widget until we can calculate it's size which should take 1 frame
       _menuSize = Size.zero;
       _currentMenu = child;
+      _isFullMode = isFullMode;
     });
   }
 
   /// Hides the current popup if there is one. Fails silently if not.
-  void hide() => setState(() => _currentMenu = null);
+  void hide() => setState(() {
+        _currentMenu = null;
+        _isFullMode = false;
+      });
 
   /// re-position and rebuild whenever menu size changes
   void _handleMenuSizeChanged(Size value) => setState(() => _menuSize = value);
@@ -151,6 +153,32 @@ class ContextMenuOverlayState extends State<ContextMenuOverlay> {
     bool appWasResized = size != _prevSize;
     if (appWasResized) _currentMenu = null;
     _prevSize = size;
+  }
+
+  Offset _calculateMenuPosition() {
+    if (_isFullMode) {
+      return Offset(_prevSize!.width / 2 - _menuSize.width / 2,
+          _prevSize!.height / 2 - _menuSize.height / 2);
+    }
+    double dx = 0, dy = 0;
+    if (_mousePos.dx + _menuSize.width > (_prevSize?.width ?? 0))
+      dx = -_menuSize.width;
+    if (_mousePos.dy + _menuSize.height > (_prevSize?.height ?? 0)) {
+      dy = -(_mousePos.dy +
+          _menuSize.height -
+          (_prevSize?.height ?? 0) +
+          edgePadding);
+    }
+    // The final menuPos, is mousePos + quadrant offset
+
+    Offset menuPos = _mousePos + Offset(dx, dy);
+    if (menuPos.dx < 0) {
+      menuPos = Offset(edgePadding, menuPos.dy);
+    }
+    if (menuPos.dy < 0) {
+      menuPos = Offset(menuPos.dx, edgePadding);
+    }
+    return menuPos;
   }
 }
 

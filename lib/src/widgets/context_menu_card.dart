@@ -29,8 +29,8 @@ class ContextMenuCard extends StatelessWidget {
     return ConstrainedBox(
       constraints: BoxConstraints(
           minWidth: 250,
-          maxWidth: MediaQuery.of(context).size.width * 0.7,
-          maxHeight: MediaQuery.of(context).size.height * 0.7),
+          maxWidth: MediaQuery.of(context).size.width * 0.8,
+          maxHeight: MediaQuery.of(context).size.height * 0.8),
       child: ClipRRect(
         borderRadius: radius,
         child: SingleChildScrollView(
