@@ -53,6 +53,7 @@ class ContextMenuOverlayState extends State<ContextMenuOverlay> {
 
   Widget? _currentMenu;
   bool _isFullMode = false;
+  bool _isHideOnResize = true;
   Size? _prevSize;
   Size _menuSize = Size.zero;
   Offset _mousePos = Offset.zero;
@@ -70,7 +71,10 @@ class ContextMenuOverlayState extends State<ContextMenuOverlay> {
     return LayoutBuilder(
       builder: (_, constraints) {
         // Remove any open menus when we resize (common behavior, and avoids edge cases / complexity)
-        _nullMenuIfOverlayWasResized(constraints);
+        if (_isHideOnResize)
+          _nullMenuIfOverlayWasResized(constraints);
+        else
+          _prevSize = constraints.biggest;
         // Offset the menu depending on which quadrant of the app we're in, this will make sure it always stays in bounds.
         Offset _menuPos = _calculateMenuPosition();
         Widget? menuToShow = _currentMenu;
@@ -128,12 +132,14 @@ class ContextMenuOverlayState extends State<ContextMenuOverlay> {
 
   /// Sets the current menu to be displayed.
   /// It will not be displayed until next frame, as the child needs to be measured first.
-  void show(Widget child, {bool isFullMode = false}) {
+  void show(Widget child,
+      {bool isFullMode = false, bool isHideOnResize = true}) {
     setState(() {
       //This will hide the widget until we can calculate it's size which should take 1 frame
       _menuSize = Size.zero;
       _currentMenu = child;
       _isFullMode = isFullMode;
+      _isHideOnResize = isHideOnResize;
     });
   }
 
@@ -141,6 +147,7 @@ class ContextMenuOverlayState extends State<ContextMenuOverlay> {
   void hide() => setState(() {
         _currentMenu = null;
         _isFullMode = false;
+        _isHideOnResize = true;
       });
 
   /// re-position and rebuild whenever menu size changes
