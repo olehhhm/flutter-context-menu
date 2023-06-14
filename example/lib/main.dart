@@ -28,7 +28,8 @@ class MyApp extends StatelessWidget {
 /// Presents the tests with default styling
 class DefaultMenuTests extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => ContextMenuOverlay(child: TestContent(title: "Default Menus"));
+  Widget build(BuildContext context) =>
+      ContextMenuOverlay(child: TestContent(title: "Default Menus"));
 }
 
 class StyledMenuTests extends StatelessWidget {
@@ -54,14 +55,17 @@ class CustomMenuTests extends StatelessWidget {
   Widget build(BuildContext context) {
     return ContextMenuOverlay(
       /// Make a custom background
-      cardBuilder: (_, children) => Container(color: Colors.purple.shade100, child: Column(children: children)),
+      cardBuilder: (_, children) => Container(
+          color: Colors.purple.shade100, child: Column(children: children)),
 
       /// Make custom buttons
       buttonBuilder: (_, config, [__]) => TextButton(
         onPressed: config.onPressed,
         child: Container(width: double.infinity, child: Text(config.label)),
       ),
-      child: Container(color: Colors.blue.shade200, child: TestContent(title: "Custom Menus")),
+      child: Container(
+          color: Colors.blue.shade200,
+          child: TestContent(title: "Custom Menus")),
     );
   }
 }
@@ -88,7 +92,8 @@ class TestContent extends StatelessWidget {
           /// Example hyperlink menu
           ContextMenuRegion(
             contextMenu: LinkContextMenu(url: 'http://flutter.dev'),
-            child: TextButton(onPressed: () {}, child: Text("http://flutter.dev")),
+            child:
+                TextButton(onPressed: () {}, child: Text("http://flutter.dev")),
           ),
 
           /// Custom Context Menu for an Image
@@ -97,11 +102,13 @@ class TestContent extends StatelessWidget {
               buttonConfigs: [
                 ContextMenuButtonConfig(
                   "View image in browser",
-                  onPressed: () => launch(_testImageUrl),
+                  onPressed: () => launchUrl(Uri.parse(_testImageUrl),
+                      mode: LaunchMode.externalApplication),
                 ),
                 ContextMenuButtonConfig(
                   "Copy image path",
-                  onPressed: () => Clipboard.setData(ClipboardData(text: _testImageUrl)),
+                  onPressed: () =>
+                      Clipboard.setData(ClipboardData(text: _testImageUrl)),
                 )
               ],
             ),

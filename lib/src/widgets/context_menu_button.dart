@@ -30,14 +30,14 @@ class _ContextMenuButtonState extends State<ContextMenuButton> {
         ? Colors.white
         : Colors.black;
     ContextMenuButtonStyle style = ContextMenuButtonStyle(
-      textStyle: widget.style?.textStyle ??
-          Theme.of(context).accentTextTheme.bodyText1,
+      textStyle:
+          widget.style?.textStyle ?? Theme.of(context).textTheme.bodyMedium,
       shortcutTextStyle: widget.style?.shortcutTextStyle ??
-          Theme.of(context).accentTextTheme.bodyText2,
+          Theme.of(context).textTheme.bodyMedium,
       fgColor: widget.style?.fgColor ?? defaultTextColor,
       bgColor: widget.style?.bgColor ?? Colors.transparent,
       hoverBgColor: widget.style?.hoverBgColor ??
-          Theme.of(context).backgroundColor.withOpacity(.2),
+          Theme.of(context).colorScheme.background.withOpacity(.2),
       hoverFgColor:
           widget.style?.hoverFgColor ?? Theme.of(context).colorScheme.secondary,
       padding: widget.style?.padding ?? EdgeInsets.all(6),
